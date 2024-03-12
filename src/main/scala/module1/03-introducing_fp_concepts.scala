@@ -204,19 +204,30 @@ object hof{
    *
    * Реализовать метод printIfAny, который будет печатать значение, если оно есть
    */
-
+  def printIfAny[T](option: Option[T]): Unit = option match {
+    case Some(v) => println(v)
+    case None => ()
+  }
 
   /**
    *
    * Реализовать метод zip, который будет создавать Option от пары значений из 2-х Option
    */
-
+  def zip[A, B](o1: Option[A], o2: Option[B]): Option[(A, B)] = (o1, o2) match {
+    case (None, None) => None
+    case (Some(o1), Some(o2)) => Some(o1, o2)
+  }
 
   /**
    *
    * Реализовать метод filter, который будет возвращать не пустой Option
    * в случае если исходный не пуст и предикат от значения = true
    */
+  def filter[T](option: Option[T] , p: T => Boolean): Option[T] = option match {
+    case None => None
+    case Some(v) => if (p(v)) option else None
+
+  }
 
  }
 
@@ -230,16 +241,21 @@ object hof{
     */
 
 
-    sealed trait List[T]{
+    sealed trait List[+T]{
 
-     // def ::
+     def ::[A >: T](element: A): List[A] = element :: this
 
-     // map
+     def map[B](f: T => B): List[B] = flatMap(t => List(f(t)))
 
-     // flatMap
+     def flatMap[B](f: T => List[B]): List[B] = this match {
+       case Some(v) => f(v)
+       case None => None
+     }
 
     }
 
+   case class Some[V](v: V) extends List[V]
+   case object None extends List[Nothing]
     object List{
       case class ::[A](head: A, tail: List[A]) extends List[A]
       case object Nil extends List[Nothing]
@@ -256,11 +272,16 @@ object hof{
      * Метод cons, добавляет элемент в голову списка, для этого метода можно воспользоваться названием `::`
      *
      */
+   def ::[T](element: T): List[T] = element :: this
 
     /**
       * Метод mkString возвращает строковое представление списка, с учетом переданного разделителя
       *
       */
+   def mkString[T](list: List[T], separator: String): String = list match {
+     case ::(head, tail) => s"$head" + tail.mkString(separator)
+     case None => ""
+   }
 
     /**
       * Конструктор, позволяющий создать список из N - го числа аргументов
@@ -269,28 +290,44 @@ object hof{
       * Например вот этот метод принимает некую последовательность аргументов с типом Int и выводит их на печать
       * def printArgs(args: Int*) = args.foreach(println(_))
       */
+    def printArgs[T](args: T*): List[T] = {
+      val list: List[T] = None
+      args.foreach(_ :: list)
+      list
+    }
 
     /**
       *
       * Реализовать метод reverse который позволит заменить порядок элементов в списке на противоположный
       */
-
+   def reverse[T](list: List[T]): List[T] = list match {
+     case Some => reverse(list)
+     case Nil => None
+   }
     /**
       *
       * Реализовать метод map для списка который будет применять некую ф-цию к элементам данного списка
       */
+    def map[A](list: List[A], f: List[A] => List[A]): List[A] = f(list)
 
 
     /**
       *
       * Реализовать метод filter для списка который будет фильтровать список по некому условию
       */
+    def filter[A](list: List[A], p: A => Boolean): List[A] = list match {
+      case Some => list.flatMap(v => if(p(v)) v :: None else None)
+      case Nil => None
+    }
 
     /**
       *
       * Написать функцию incList котрая будет принимать список Int и возвращать список,
       * где каждый элемент будет увеличен на 1
       */
+   def incList(list: List[Int]): List[Int] = {
+     list.map(v => v + 1)
+   }
 
 
     /**
@@ -298,5 +335,8 @@ object hof{
       * Написать функцию shoutString котрая будет принимать список String и возвращать список,
       * где к каждому элементу будет добавлен префикс в виде '!'
       */
+    def shoutString(list: List[String]): List[String] = {
+      list.map(v => '!' + v)
+    }
 
  }
