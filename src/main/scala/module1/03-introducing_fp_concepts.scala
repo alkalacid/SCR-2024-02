@@ -204,7 +204,7 @@ object hof{
    *
    * Реализовать метод printIfAny, который будет печатать значение, если оно есть
    */
-  def printIfAny[T](option: Option[T]): Unit = option match {
+  def printIfAny[T](option: Option[T]) = option match {
     case Some(v) => println(v)
     case None => ()
   }
@@ -214,8 +214,8 @@ object hof{
    * Реализовать метод zip, который будет создавать Option от пары значений из 2-х Option
    */
   def zip[A, B](o1: Option[A], o2: Option[B]): Option[(A, B)] = (o1, o2) match {
-    case (None, None) => None
     case (Some(o1), Some(o2)) => Some(o1, o2)
+    case _ => None
   }
 
   /**
@@ -224,8 +224,8 @@ object hof{
    * в случае если исходный не пуст и предикат от значения = true
    */
   def filter[T](option: Option[T] , p: T => Boolean): Option[T] = option match {
-    case None => None
     case Some(v) => if (p(v)) option else None
+    case _ => None
 
   }
 
@@ -316,7 +316,7 @@ object hof{
       * Реализовать метод filter для списка который будет фильтровать список по некому условию
       */
     def filter[A](list: List[A], p: A => Boolean): List[A] = list match {
-      case Some => list.flatMap(v => if(p(v)) v :: None else None)
+      case Some(v) => list.flatMap(el => if(p(v)) el :: None else None)
       case Nil => None
     }
 
